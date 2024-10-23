@@ -11,7 +11,7 @@ function main() {
     attribute vec2 a_position;
 
     void main(){
-        gl_Position = vec4(a_position, 0.0, 1.0)
+        gl_Position = vec4(a_position, 0.0, 1.0);
     }
     `
 
@@ -58,12 +58,12 @@ function main() {
         0.5, 0.5,
         -0.5, 0.5,
         0.5, -0.5,
-        -0.5, -0.5,
+        -0.5, -0.5
     ]);
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.bufferData(positionBuffer, new Float32Array(squareVertexPositions), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER,squareVertexPositions, gl.STATIC_DRAW);
 
     /*location refers to the location of the attributes defined in shader or fragment glsl
     *In this case refers to the a_position attribute defined in shader program
