@@ -7,21 +7,8 @@ function main() {
         throw new Error('WebGL not supported');
     }
 
-    const vertexShaderSrc = `
-    attribute vec2 a_position;
-
-    void main(){
-        gl_Position = vec4(a_position, 0.0, 1.0);
-    }
-    `
-
-    const fragmentShaderSrc = `
-    precision mediump float;
-
-    void main(){
-        gl_FragColor = vec4(1.0,0.0,1.0,1.0);
-    }
-    `
+    const vertexShaderSrc = document.getElementById('vertexShader').text;
+    const fragmentShaderSrc = document.getElementById('vertexShader').text;
 
 
     //create shaders and attach to program 
