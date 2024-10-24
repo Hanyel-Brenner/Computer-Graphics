@@ -6,23 +6,30 @@
     <title>WebGL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="shapes.js"></script>
     <script src="shaderProgram.js" defer></script>
     <script src="main.js" defer></script>
 
     <script id="vertexShader" type="text">
-        precision mediump float;
-
-        void main(){
-            gl_FragColor = vec4(1.0,0.0,1.0,1.0);
-        }
-    </script>
-    <script id="fragmentShader" type="text">
         attribute vec2 a_position;
-
+        attribute vec3 color;
+        varying vec3 vColor;
+        
         void main(){
             gl_Position = vec4(a_position, 0.0, 1.0);
+            vColor = vec3(1.0,0.0,0.0);
         }
     </script>
+    
+    <script id="fragmentShader" type="text">
+        precision mediump float;
+        varying vec3 vColor;
+        
+        void main(){
+            gl_FragColor = vec4(vColor,1.0);
+        }
+    </script>
+    
 </head>
 <body>
     <canvas id="c"></canvas>
