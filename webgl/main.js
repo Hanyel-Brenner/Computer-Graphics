@@ -37,8 +37,8 @@ function main() {
 
     var numberOfCirclePoints = 50000;
     
-    const generatedVertexPositions = Circle(1,numberOfCirclePoints);
-    console.log(generatedVertexPositions);
+    const generatedVertexPositions = new Float32Array(rectangle(0.0,0.0, 0.5, -0.8))//circle(-0.3,-0.3,0.5,numberOfCirclePoints); rectangle(0.0,0.0, 0.5, -0.8)
+    const generatedColor = new Float32Array();
 
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
