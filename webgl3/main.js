@@ -102,7 +102,6 @@ function main() {
     }
 
     render();
-
 }   
 
 main();
