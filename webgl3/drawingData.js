@@ -54,3 +54,60 @@ const clownCirclesColor = [
                             [0.0, 0.0, 1.0],
                             [1.0, 1.0, 1.0]  
                           ];
+
+function drawFigureCirclesFirst(gl, positionBuffer, colorBuffer, figureTriangles, figureTrianglesColor, figureCircles, figureCirclesColor){
+
+  if(figureCircles != null)
+  {
+    for(let i=0; i<figureCircles.length; i++)
+    {
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setCircleVertices(gl,figureCircles[i][0], figureCircles[i][1], figureCircles[i][2], N_OF_CIRCLE_POINTS)
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setCircleColor(gl, figureCirclesColor[i][0], figureCirclesColor[i][1], figureCirclesColor[i][2], N_OF_CIRCLE_POINTS);
+
+        gl.drawArrays(gl.TRIANGLES,0, N_OF_CIRCLE_POINTS*6);
+    }
+  }
+
+  if(figureTriangles != null)
+  {
+    for(let i=0; i<figureTriangles.length; i++)
+    {
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setRectangleVertices(gl, figureTriangles[i][0], figureTriangles[i][1], figureTriangles[i][2], figureTriangles[i][3]);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setRectangleColor(gl,figureTrianglesColor[i][0],figureTrianglesColor[i][1], figureTrianglesColor[i][2]);
+    
+        gl.drawArrays(gl.TRIANGLES,0,6);
+    }
+  }
+}
+
+function drawFigureRectangleFirst(gl, positionBuffer, colorBuffer, figureTriangles, figureTrianglesColor, figureCircles, figureCirclesColor){
+
+  if(figureTriangles != null)
+  {
+    for(let i=0; i<figureTriangles.length; i++)
+    {
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setRectangleVertices(gl, figureTriangles[i][0], figureTriangles[i][1], figureTriangles[i][2], figureTriangles[i][3]);
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setRectangleColor(gl,figureTrianglesColor[i][0],figureTrianglesColor[i][1], figureTrianglesColor[i][2]);
+    
+        gl.drawArrays(gl.TRIANGLES,0,6);
+    }
+  }
+  if(figureCircles != null)
+  {
+    for(let i=0; i<figureCircles.length; i++)
+    {
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        setCircleVertices(gl,figureCircles[i][0], figureCircles[i][1], figureCircles[i][2], N_OF_CIRCLE_POINTS)
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        setCircleColor(gl, figureCirclesColor[i][0], figureCirclesColor[i][1], figureCirclesColor[i][2], N_OF_CIRCLE_POINTS);
+
+        gl.drawArrays(gl.TRIANGLES,0, N_OF_CIRCLE_POINTS*6);
+    }
+  }
+}

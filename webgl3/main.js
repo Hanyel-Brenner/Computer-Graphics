@@ -2,8 +2,11 @@
 *CONSTS
 */
 const N_OF_CIRCLE_POINTS = 100;
+const tx=0, ty=0;
 
 function main() {
+
+    const body = document.querySelector('body');
     const canvas = document.getElementById('canvas');
     const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true } );
 
@@ -36,16 +39,34 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
 
+
+/*
+*Event listeners for keyboard or mouse
+*/    
+const figure = 0;
+
+    body.addEventListener("keydown", function(event){
+        keyboardPress(gl, positionBuffer, colorBuffer, event, tx, ty);
+    }, false);
+
+/*
+*Definition of transformation matrix;
+*/    
     const transfMatrixLoc = gl.getUniformLocation(program, 'matrix');
     const matrix = mat4.create();
-    console.log(matrix);
+
+    mat4.translate(matrix, matrix, [0.5, 0.5, 0]);
+    mat4.scale(matrix, matrix, [0.75, 0.75, 1]);
+    mat4.rotateZ(matrix, matrix, Math.PI / 2);
+    gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
+
     /*
     *clear screen
     */
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
-  
+
 }   
 
 main();
