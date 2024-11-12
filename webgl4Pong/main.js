@@ -1,6 +1,28 @@
 const N_OF_CIRCLE_POINTS = 100;
-var tx=0.0, ty=0.0;
-var tx_step = 0.0, ty_step = 0.0;
+
+inputs = {
+    NO_KEY : -1,
+    START : 0, 
+    EXIT : 1,
+    P1_UP : 2,
+    P1_DOWN : 3,
+    P2_UP : 4,
+    P2_DOWN : 5,
+}
+
+var input;
+
+var default_step = 0.01;
+var default_step_ball = 0.03;
+
+var ty_P1 = 0.0;
+var ty_step_P1 = 0.0;
+var ty_P2 = 0.0;
+var ty_step_P2 = 0.0;
+
+var tx_ball;
+var ty_ball;
+
 
 function main() {
 
@@ -41,8 +63,8 @@ function main() {
 /*
 *Event listeners for keyboard or mouse
 */    
-    body.addEventListener("keydown", function(event){
-        keyboardPress(gl, positionBuffer, colorBuffer, event, tx, ty);
+    body.addEventListener("keypress", function(event){
+        keyboardPress(event);
     }, false);
 
 /*
@@ -51,11 +73,11 @@ function main() {
     const transfMatrixLoc = gl.getUniformLocation(program, 'matrix');
     const matrix = mat4.create();
 
-    mat4.translate(matrix, matrix, [0.5, 0.5, 0]);
+    /*mat4.translate(matrix, matrix, [0.5, 0.5, 0]);
     mat4.scale(matrix, matrix, [0.75, 0.75, 1]);
     mat4.rotateZ(matrix, matrix, Math.PI / 2);
     gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
-
+*/
     /*
     *clear screen
     */
@@ -65,30 +87,27 @@ function main() {
 
     function render(){
 
-        gl.clear(gl.COLOR_BUFFER_BIT);
+        //gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
         mat4.identity(matrix);
+        //tx += tx_step;
+        //ty += ty_step;
 
-        tx += tx_step;
-        ty += ty_step;
-        angleSpeed += 0.01;
+       /*if( input == inputs.P1_UP) 
+        {
+            console.log(".");
+            input = inputs.NO_KEY;
+        }*/
 
-        if(tx >= 1 || tx <= -1) tx_step = -tx_step;
+        switch(input){
+            case inputs.P1_UP:
 
-        switch(figure){
-            case 1:
-                mat4.translate(matrix, matrix, [tx, ty, 0]);
-                gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
-                drawFigureCirclesFirst(gl, positionBuffer, colorBuffer, carTriangles, carTrianglesColor, carWheels, carWheelsColor);
-            break;
-            case 2:
-                mat4.rotateZ(matrix, matrix, angleSpeed); 
-                gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
-                drawFigureCirclesFirst(gl, positionBuffer, colorBuffer, flowerTriangles, flowerTrianglesColor, flowerCircles, flowerCircleColor);
-            break;
-            case 3:
-                mat4.rotateZ(matrix, matrix, angleSpeed); 
-                gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
-                drawFigureCirclesFirst(gl, positionBuffer, colorBuffer, clownTriangles, clownTrianglesColor, clownCircles, clownCirclesColor);
+                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+                setRectangleVertices(gl, p1[0], p1[1], p1[2], p1[3]);
+                gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+                setRectangleColor(gl, p1Color[0], p1Color[1], p1Color[2]);
+                gl.drawArrays(gl.TRIANGLES, 0, 6);
+                
             break;
         }
         
