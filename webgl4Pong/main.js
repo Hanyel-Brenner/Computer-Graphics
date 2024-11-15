@@ -23,6 +23,7 @@ var ty_step_P2 = 0.0;
 var tx_ball;
 var ty_ball;
 
+var isRunning = false;
 
 function main() {
 
@@ -86,33 +87,37 @@ function main() {
     gl.viewport(0, 0, canvas.width, canvas.height);
 
     function render(){
-
+        
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        
+        if(isRunning == false){
+            printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
+            printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
+        }
         //gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
-        mat4.identity(matrix);
-        //tx += tx_step;
-        //ty += ty_step;
-
+        //gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
+        //mat4.identity(matrix);
+    
        /*if( input == inputs.P1_UP) 
         {
             console.log(".");
             input = inputs.NO_KEY;
         }*/
 
-        switch(input){
-            case inputs.P1_UP:
+            mat4.identity(matrix);
 
-                gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-                setRectangleVertices(gl, p1[0], p1[1], p1[2], p1[3]);
-                gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-                setRectangleColor(gl, p1Color[0], p1Color[1], p1Color[2]);
-                gl.drawArrays(gl.TRIANGLES, 0, 6);
-                
-            break;
-        }
+            /*insert matrix transformations here*/
+
+            gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
+
+
+            switch(input){
+
+            }
+
+            requestAnimationFrame(render);
         
-        requestAnimationFrame(render);
-    }
+        }
 
     render();
 }   
