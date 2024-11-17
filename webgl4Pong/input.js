@@ -1,21 +1,14 @@
-function keyboardPress(event){
-  switch(event.key){
-    case "1":
-      input = inputs.START;
-    break;
-    case "0":
-      input = inputs.EXIT;
-    case "w":
-      input = inputs.P1_UP;
-    break;
-    case "s":
-      input = inputs.P1_DOWN;
-    break;
-    case "ArrowUp":
-      input = inputs.P2_UP;
-    break;
-    case "ArrowDown":
-      input = inputs.P2_DOWN;
-    break;
-  }
+function keyboardPressDown(event){
+  keysPressed[event.keyCode] = true;
+}
+
+function keyboardPressUp(event){
+  keysPressed[event.keyCode] = false
+}
+
+function updatePlayerPosition(){
+  if(keysPressed[87] == true) dyPlayer1 += yPlayerSpeed; //w
+  if(keysPressed[83] == true) dyPlayer1 -= yPlayerSpeed; //s
+  if(keysPressed[38] == true) dyPlayer2 += yPlayerSpeed; //ArrowUp
+  if(keysPressed[40] == true) dyPlayer2 -= yPlayerSpeed; //ArrowDown
 }

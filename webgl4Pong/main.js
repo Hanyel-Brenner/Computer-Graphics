@@ -1,24 +1,14 @@
 const N_OF_CIRCLE_POINTS = 100;
 
+/*
+*keysPressed maintains a hashmap of the state of keys pressed at a given moment with a boolean mapped to the keyCode of a keydown event
+*/
 keysPressed = {}; 
 
-inputs = {
-    SOME_KEY : -2,
-    NO_KEY : -1,
-    START : 0, 
-    EXIT : 1,
-    P1_UP : 2,
-    P1_DOWN : 3,
-    P2_UP : 4,
-    P2_DOWN : 5,
-}
-
 var isRunning = true;
-var input;
 
 var yPlayerSpeed = 0.01;
 var xPlayerSpeed = 0.01;
-
 var xBallSpeed = 0.03
 var yBallSpeed = 0.03;
 
@@ -79,9 +69,9 @@ function main() {
     const matrixP1 = mat4.create();
     const matrixP2 = mat4.create();
 
-    /*
-    *clear screen
-    */
+/*
+*clear screen
+*/
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -98,37 +88,18 @@ function main() {
         mat4.identity(matrixP1);
         mat4.identity(matrixP2);
 
-        switch(input){
+        /*
+        *given the state of keysPressed, updates the player displacement in y-direction
+        */
+        updatePlayerPosition();
+        // TODO updateBallPosition();
 
-            case inputs.START:
-                if(isRunning == true) break;
-                isRunning = true;
-                console.log("Game started!");
-            break;
-
-            case inputs.P1_UP:
-                dyPlayer1 += yPlayerSpeed;
-            break;
-            
-            case inputs.P1_DOWN:
-                dyPlayer1 -= yPlayerSpeed;
-            break;
-
-            case inputs.P2_UP:
-                dyPlayer2 += yPlayerSpeed;
-            break;
-            
-        }
-
-        gl.clear(gl.COLOR_BUFFER_BIT);
         mat4.translate(matrixP1, matrixP1, [0, dyPlayer1 ,0]);
         mat4.translate(matrixP2, matrixP2, [0, dyPlayer2, 0]);
         gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP1);
         printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
         gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP2)
         printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
-
-        input = inputs.NO_KEY;
 
         requestAnimationFrame(render);
     }
