@@ -1,6 +1,9 @@
 const N_OF_CIRCLE_POINTS = 100;
 
+keysPressed = {}; 
+
 inputs = {
+    SOME_KEY : -2,
     NO_KEY : -1,
     START : 0, 
     EXIT : 1,
@@ -10,20 +13,17 @@ inputs = {
     P2_DOWN : 5,
 }
 
+var isRunning = true;
 var input;
 
-var default_step = 0.01;
-var default_step_ball = 0.03;
+var yPlayerSpeed = 0.01;
+var xPlayerSpeed = 0.01;
 
-var ty_P1 = 0.0;
-var ty_step_P1 = 0.0;
-var ty_P2 = 0.0;
-var ty_step_P2 = 0.0;
+var xBallSpeed = 0.03
+var yBallSpeed = 0.03;
 
-var tx_ball;
-var ty_ball;
-
-var isRunning = false;
+var dxPlayer1 = 0.0, dyPlayer1 = 0.0;
+var dxPlayer2 = 0.0, dyPlayer2 = 0.0;
 
 function main() {
 
@@ -64,21 +64,21 @@ function main() {
 /*
 *Event listeners for keyboard or mouse
 */    
-    body.addEventListener("keypress", function(event){
-        keyboardPress(event);
-    }, false);
+    body.addEventListener("keydown", function(event){
+        keyboardPressDown(event);
+    },false);
+
+    body.addEventListener("keyup", function(event){
+        keyboardPressUp(event);
+    },false);
 
 /*
 *Definition of transformation matrix;
 */    
     const transfMatrixLoc = gl.getUniformLocation(program, 'matrix');
-    const matrix = mat4.create();
+    const matrixP1 = mat4.create();
+    const matrixP2 = mat4.create();
 
-    /*mat4.translate(matrix, matrix, [0.5, 0.5, 0]);
-    mat4.scale(matrix, matrix, [0.75, 0.75, 1]);
-    mat4.rotateZ(matrix, matrix, Math.PI / 2);
-    gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
-*/
     /*
     *clear screen
     */
@@ -94,30 +94,44 @@ function main() {
             printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
             printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
         }
-        //gl.clear(gl.COLOR_BUFFER_BIT);
-        //gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
-        //mat4.identity(matrix);
-    
-       /*if( input == inputs.P1_UP) 
-        {
-            console.log(".");
-            input = inputs.NO_KEY;
-        }*/
 
-            mat4.identity(matrix);
+        mat4.identity(matrixP1);
+        mat4.identity(matrixP2);
 
-            /*insert matrix transformations here*/
+        switch(input){
 
-            gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
+            case inputs.START:
+                if(isRunning == true) break;
+                isRunning = true;
+                console.log("Game started!");
+            break;
 
+            case inputs.P1_UP:
+                dyPlayer1 += yPlayerSpeed;
+            break;
+            
+            case inputs.P1_DOWN:
+                dyPlayer1 -= yPlayerSpeed;
+            break;
 
-            switch(input){
-
-            }
-
-            requestAnimationFrame(render);
-        
+            case inputs.P2_UP:
+                dyPlayer2 += yPlayerSpeed;
+            break;
+            
         }
+
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        mat4.translate(matrixP1, matrixP1, [0, dyPlayer1 ,0]);
+        mat4.translate(matrixP2, matrixP2, [0, dyPlayer2, 0]);
+        gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP1);
+        printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
+        gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP2)
+        printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
+
+        input = inputs.NO_KEY;
+
+        requestAnimationFrame(render);
+    }
 
     render();
 }   
