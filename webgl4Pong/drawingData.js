@@ -5,6 +5,8 @@ var p2Color = [0.0, 1.0, 0.0];
 var ball = [0.0, 0.0, 0.05];
 var ballColor = [0.0, 0.0, 0.0];
 
+var playableBox = [-1.0, 1.0, 2.0, -2.0];
+
 function printPlayer(gl, positionBuffer, colorBuffer,playerData, playerColor){
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     setRectangleVertices(gl, playerData[0], playerData[1], playerData[2], playerData[3]);
