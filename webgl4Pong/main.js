@@ -9,11 +9,16 @@ var isRunning = true;
 
 var yPlayerSpeed = 0.01;
 var xPlayerSpeed = 0.01;
-var xBallSpeed = 0.03
-var yBallSpeed = 0.03;
+
+var xBallSpeed = -0.0001;
+var yBallSpeed = 0.0000;
 
 var dxPlayer1 = 0.0, dyPlayer1 = 0.0;
 var dxPlayer2 = 0.0, dyPlayer2 = 0.0;
+var dxBall = 0.0, dyBall = 0.0;
+
+var radius = ball[2];
+var ballPointsOfContact;
 
 function main() {
 
@@ -68,6 +73,7 @@ function main() {
     const transfMatrixLoc = gl.getUniformLocation(program, 'matrix');
     const matrixP1 = mat4.create();
     const matrixP2 = mat4.create();
+    const matrixBall = mat4.create();
 
 /*
 *clear screen
@@ -76,6 +82,9 @@ function main() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
 
+    var newP1 = [...p1], newP2 = [...p2], newBall = [...ball];
+
+    let counter = 0;
     function render(){
         
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -87,19 +96,39 @@ function main() {
 
         mat4.identity(matrixP1);
         mat4.identity(matrixP2);
+        //mat4.identity(matrixBall);
+        printPlayer(gl, positionBuffer, colorBuffer, newP1, p1Color);
+        if(counter < 1000) console.log(newP1);
+        counter++;
+
 
         /*
         *given the state of keysPressed, updates the player displacement in y-direction
         */
-        updatePlayerPosition();
-        // TODO updateBallPosition();
+
+        ballPointsOfContact = redefineBallPointsOfContact(newBall, radius);
+
+        if(isPointInArea(ballPointsOfContact.leftPoint, newP1)){
+            xBallSpeed = -xBallSpeed;
+        }
+
+        updatePlayerDisplacement();
+        updateBallDisplacement();
+
+        newP1 = updatePlayerPosition(p1, dyPlayer1);
+        newP2 = updatePlayerPosition(p2, dyPlayer2);
+        newBall = updateBallPosition(ball, dxBall, dyBall);
 
         mat4.translate(matrixP1, matrixP1, [0, dyPlayer1 ,0]);
         mat4.translate(matrixP2, matrixP2, [0, dyPlayer2, 0]);
+        mat4.translate(matrixBall, matrixBall, [dxBall, dyBall, 0] );
+
         gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP1);
         printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
         gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP2)
         printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
+        gl.uniformMatrix4fv(transfMatrixLoc, false, matrixBall);
+        printBall(gl, positionBuffer, colorBuffer, ball, ballColor, N_OF_CIRCLE_POINTS);
 
         requestAnimationFrame(render);
     }
