@@ -30,23 +30,21 @@ function setCircleVertices(gl,c_x, c_y, radius, numberOfPoints){
 *data is put in dynamic array so must be converted to a typed float array outside of function
 */
 function setRectangleVertices(gl,x,y,width, height){
-  var vertices = [];
-  vertices.push(x);
-  vertices.push(y);
-  vertices.push(x + width);
-  vertices.push(y);
-  vertices.push(x);
-  vertices.push(y + height);
+  let x1 = x;
+  let y1 = y;
+  let x2 = x1 + width;
+  let y2 = y1 + height;
+  let vertexData = [];
+  vertexData = [
+      x1, y1, 0.0,
+      x2, y1, 0.0,
+      x1, y2, 0.0,  
+      x1, y2, 0.0,
+      x2, y1, 0.0,
+      x2, y2, 0.0,
+  ]
 
-  vertices.push(x + width);
-  vertices.push(y);
-  vertices.push(x);
-  vertices.push(y + height);
-  vertices.push(x + width);
-  vertices.push(y + height);
-
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
 }
 
 /* 

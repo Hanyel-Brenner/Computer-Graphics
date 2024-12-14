@@ -33,7 +33,7 @@ function main() {
     const positionLocation = gl.getAttribLocation(program,'position');
     gl.enableVertexAttribArray(positionLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(positionLocation, 3, gl.FLOAT, false, 0, 0);
 
     const colorLocation = gl.getAttribLocation(program,'color');
     gl.enableVertexAttribArray(colorLocation);
@@ -65,11 +65,40 @@ function main() {
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
 
+    var matrix = mat4.create();
+    var viewingMatrix = mat4.create();
+    var windowViewportMatrix = mat4.create();
+    var wcRange = 1;
+    var wc_step = 0.05;
+
     function render(){
-        
+
+        gl.clearColor(1.0, 1.0, 1.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT);
         
+        //if(wcRange <= 0.5 || wcRange >= 2) wc_step = -wc_step;
+    
+        //wcRange += wc_step;
+        viewingMatrix = get2DViewingMatrix([0.3, 0.3], 35);
+        windowViewportMatrix = get2DWindowToViewportMatrix(-wcRange, wcRange, -wcRange, wcRange);
+        mat4.multiply(matrix, viewingMatrix, windowViewportMatrix);
+        gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
+
+        gl.viewport(0, 0, canvas.width/2, canvas.height/2);
         
+        drawSquare(gl, positionBuffer, colorBuffer, p1, p1Color );
+    
+        gl.viewport(canvas.width/2, 0, canvas.width/2, canvas.height/2);
+        
+        drawSquare(gl, positionBuffer, colorBuffer, p1, p1Color );
+
+        gl.viewport( 0, canvas.height/2 ,canvas.width/2, canvas.height/2);
+        
+        drawSquare(gl, positionBuffer, colorBuffer, p1, p1Color );
+
+        gl.viewport(canvas.width/2, canvas.height/2, canvas.width/2, canvas.height/2);
+        
+        drawSquare(gl, positionBuffer, colorBuffer, p1, p1Color );
 
         requestAnimationFrame(render);
     }
