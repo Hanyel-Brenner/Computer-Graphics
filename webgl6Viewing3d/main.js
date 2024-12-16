@@ -5,12 +5,12 @@ const MAX_POINTS = 3;
 */
 keysPressed = {}; 
 
-const colors = [[1.0, 0.0, 0.0],
-                [0.0, 1.0, 0.0],
-                [0.0 , 0.0, 1.0],
-                [1.0, 1.0, 0.0],
-                [1.0, 0.0, 1.0],
-                [0.0, 1.0, 1.0]];
+const colors = [[1.0, 0.0, 0.0],  //front, red
+                [0.0, 1.0, 0.0],  //left, green
+                [0.0 , 0.0, 1.0], //back, blue
+                [1.0, 1.0, 0.0],    //right, yellow
+                [1.0, 0.0, 1.0],    //top , purple
+                [0.0, 1.0, 1.0]];   //bottom, cyan
 
 const cubePosition = setCubeVertices();
 const cubeColor = setCubeFaceColors(colors);
