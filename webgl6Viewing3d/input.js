@@ -6,24 +6,12 @@ function keyboardPressUp(event){
   keysPressed[event.keyCode] = false
 }
 
-function updatePlayerDisplacement(){
-  if(keysPressed[87] == true) dyPlayer1 += yPlayerSpeed; //w
-  if(keysPressed[83] == true) dyPlayer1 -= yPlayerSpeed; //s
-  if(keysPressed[38] == true) dyPlayer2 += yPlayerSpeed; //ArrowUp
-  if(keysPressed[40] == true) dyPlayer2 -= yPlayerSpeed; //ArrowDown
+function updateCamera(){
+  if(keysPressed[87] == true) y0 += 0.05; //w
+  if(keysPressed[83] == true) y0 -= 0.05; //s
+  if(keysPressed[68] == true) x0 += 0.05; //a
+  if(keysPressed[65] == true) x0 -= 0.05; //d
+  if(keysPressed[38] == true) z0 += 0.05; //ArrowUp
+  if(keysPressed[40] == true) z0 -= 0.05; //ArrowDown
 }
 
-function updatePlayerPosition(player, yDisplacement){
-  let newPosition = [player[0], player[1] + yDisplacement, player[2], player[3]];
-  return newPosition;
-}
-
-function updateBallDisplacement(){
-  dxBall += xBallSpeed;
-  dyBall += yBallSpeed;
-}
-
-function updateBallPosition(ball, xDisplacement, yDisplacement){
-  let newPosition = [ball[0] + xDisplacement, ball[1] + yDisplacement, ball[2]];
-  return newPosition;
-}

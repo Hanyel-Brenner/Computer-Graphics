@@ -3,7 +3,7 @@ const MAX_POINTS = 3;
 /*
 *keysPressed maintains a hashmap of the state of keys pressed at a given moment with a boolean mapped to the keyCode of a keydown event
 */
-keysPressed = {}; 
+const keysPressed = {}; 
 
 const colors = [[1.0, 0.0, 0.0],  //front, red
                 [0.0, 1.0, 0.0],  //left, green
@@ -11,6 +11,10 @@ const colors = [[1.0, 0.0, 0.0],  //front, red
                 [1.0, 1.0, 0.0],    //right, yellow
                 [1.0, 0.0, 1.0],    //top , purple
                 [0.0, 1.0, 1.0]];   //bottom, cyan
+
+var x0 = 1.0;
+var y0= 1.0;
+var z0 = 1.0;
 
 const cubePosition = setCubeVertices();
 const cubeColor = setCubeFaceColors(colors);
@@ -80,7 +84,7 @@ function main() {
     var matrix = mat4.create();
     var vcMatrix = mat4.create();
     var wvMatrix = mat4.create();
-    var p0 = [1.0, 1.0, 1.0];
+    var p0 = [x0, y0, z0];
     var pRef = [0.0 , 0.0, 0.0];
     var V = [0.0, 1.0, 0.0];
 
@@ -92,6 +96,10 @@ function main() {
     var z_near = 0.0;
 
     function render(){
+
+        updateCamera();
+
+        p0 = [x0, y0, z0];
 
         vcMatrix = get3DViewingMatrix(p0, pRef, V);
         wvMatrix = getOrtographicMatrix(xw_min, xw_max, yw_min, yw_max, z_far, z_near);

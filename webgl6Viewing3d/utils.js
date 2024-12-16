@@ -62,6 +62,7 @@ function get3DViewingMatrix(p0, pRef, V){
 
 function getOrtographicMatrix(xw_min, xw_max, yw_min, yw_max, z_far, z_near){
     /*var matrix = mat4.create();
+
     var sx = 2/(xw_max - xw_min);
     var sy = 2/(yw_max - yw_min);
     var sz = 2/(z_near - z_far);
@@ -70,8 +71,8 @@ function getOrtographicMatrix(xw_min, xw_max, yw_min, yw_max, z_far, z_near){
     mat4.scale(matrix, matrix, [sx, sy, sz]);
     mat4.translate(matrix, matrix, [-xw_min, -yw_min, -z_far]);
 
-    return matrix;
-    */
+    return matrix;*/
+    
     let matrix = [
         2/(xw_max-xw_min), 0, 0, 0,
         0, 2/(yw_max-yw_min), 0, 0,
