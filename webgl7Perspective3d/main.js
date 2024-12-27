@@ -3,6 +3,11 @@ const MAX_POINTS = 3;
 /*
 *keysPressed maintains a hashmap of the state of keys pressed at a given moment with a boolean mapped to the keyCode of a keydown event
 */
+var mouseEventCounter = 0;
+var mousePos1 = [];
+var mousePos2 = [];
+var mouseDirection = [0,0];
+
 const keysPressed = {}; 
 
 const colors = [[1.0, 0.0, 0.0],  //front, red
@@ -16,8 +21,14 @@ const cubePosition = setCubeVertices();
 const cubeColor = setCubeFaceColors(colors);
 
 var x0 = 0.0;
-var y0 = 0.0;
-var z0 = 0.0;
+var y0 = 2.0;
+var z0 = 2.0;
+
+var xRef = 0.0;
+var yRef = 0.0;
+var zRef = 0.0;
+
+var currentAngle = 90;
 
 function main() {
 
@@ -68,6 +79,10 @@ function main() {
         keyboardPressUp(event);
     },false);
 
+    body.addEventListener("mousemove", function(event){
+        mouseTrack(event, canvas);
+    },false);
+
 /*
 *Definition of transformation matrix, initiating it with identity matrix
 */    
@@ -77,13 +92,12 @@ function main() {
 /*
 *clear screen
 */
-    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
 
-   
-    var p0 = [1.0, 1.0, 1.0];
-    var pRef = [0.0, 0.0, 0.0];
+    var p0 = [x0, y0, z0];
+    var pRef = [xRef, yRef, zRef];
     var V = [0.0, 1.0, 0.0];
 
     var xw_min = -1.0;
@@ -103,15 +117,18 @@ function main() {
 
         updateCamera();
 
+        p0 = [x0, y0, z0];
+        pRef = [xRef, yRef, zRef];
+
         cameraMatrix = mat4.create();
         persMatrix = mat4.create();
         lookAt = mat4.create();
         model = mat4.create();
         matrix = mat4.create();
         
-        mat4.rotateY(model,model, degToRad(45));
-        mat4.translate(model, model, [0.0, 0.0, -1.0]);
-        mat4.scale(model, model, [0.5, 0.5, 0.5])
+        //mat4.rotateY(model,model, degToRad(45));
+        //mat4.translate(model, model, [0.0, 0.0, -1.0]);
+        //mat4.scale(model, model, [0.5, 0.5, 0.5])
 
         cameraMatrix = get3DViewingMatrix(p0, pRef, V);
         persMatrix = getPerspectiveMatrix(xw_min, xw_max, yw_min, yw_max, z_near, z_far);
@@ -120,7 +137,7 @@ function main() {
 
         gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
 
-        gl.clearColor(1.0, 1.0, 1.0, 1.0);
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
         gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
