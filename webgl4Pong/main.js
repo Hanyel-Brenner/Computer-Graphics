@@ -1,5 +1,5 @@
 const N_OF_CIRCLE_POINTS = 100;
-
+const MAX_POINTS = 3;
 /*
 *keysPressed maintains a hashmap of the state of keys pressed at a given moment with a boolean mapped to the keyCode of a keydown event
 */
@@ -7,13 +7,19 @@ keysPressed = {};
 
 var isRunning = true;
 
-var yPlayerSpeed = 0.01;
-var xPlayerSpeed = 0.01;
-var xBallSpeed = 0.03
-var yBallSpeed = 0.03;
+var yPlayerSpeed = 0.03;
+var xPlayerSpeed = 0.03;
+var xBallSpeed = -0.008;
+var yBallSpeed = 0.008;
 
 var dxPlayer1 = 0.0, dyPlayer1 = 0.0;
 var dxPlayer2 = 0.0, dyPlayer2 = 0.0;
+var dxBall = 0.0, dyBall = 0.0;
+
+var radius = ball[2];
+var ballPointsOfContact;
+
+var pointsP1 = 0, pointsP2 = 0;
 
 function main() {
 
@@ -68,6 +74,8 @@ function main() {
     const transfMatrixLoc = gl.getUniformLocation(program, 'matrix');
     const matrixP1 = mat4.create();
     const matrixP2 = mat4.create();
+    const matrixBall = mat4.create();
+    gl.uniformMatrix4fv(transfMatrixLoc, false, mat4.create());
 
 /*
 *clear screen
@@ -75,6 +83,8 @@ function main() {
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
+
+    var newP1 = [...p1], newP2 = [...p2], newBall = [...ball];
 
     function render(){
         
@@ -85,26 +95,64 @@ function main() {
             printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
         }
 
-        mat4.identity(matrixP1);
-        mat4.identity(matrixP2);
+        ballPointsOfContact = redefineBallPointsOfContact(newBall, radius);
 
-        /*
-        *given the state of keysPressed, updates the player displacement in y-direction
-        */
-        updatePlayerPosition();
-        // TODO updateBallPosition();
+        if(isPointInArea(ballPointsOfContact.leftPoint, newP1)){
+            xBallSpeed = -xBallSpeed;
+        }
+        if(isPointInArea(ballPointsOfContact.rightPoint, newP2)){
+            xBallSpeed = -xBallSpeed;
+        }
+        if(!isPointInArea(ballPointsOfContact.leftPoint, playableBox)){
+            dxBall = 0.0;
+            dyBall = 0.0;
+            pointsP2++;
+        }
+        if(!isPointInArea(ballPointsOfContact.rightPoint, playableBox)){
+            dxBall = 0.0;
+            dyBall = 0.0;
+            pointsP1++;
+        }
+        if(!isPointInArea(ballPointsOfContact.upperPoint, playableBox)){
+            yBallSpeed = -yBallSpeed;
+        }
+        if(!isPointInArea(ballPointsOfContact.lowerPoint, playableBox)){
+            yBallSpeed = -yBallSpeed;
+        }
 
-        mat4.translate(matrixP1, matrixP1, [0, dyPlayer1 ,0]);
-        mat4.translate(matrixP2, matrixP2, [0, dyPlayer2, 0]);
-        gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP1);
-        printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
-        gl.uniformMatrix4fv(transfMatrixLoc, false, matrixP2)
-        printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
+        if(pointsP1 == MAX_POINTS){
+            console.log("Winner is player 1");
+            printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
+            printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
+            printBall(gl, positionBuffer, colorBuffer, ball, ballColor, N_OF_CIRCLE_POINTS);
+            return;
+        }
+        if(pointsP2 == MAX_POINTS){
+            console.log("Winner is player 1");
+            printPlayer(gl, positionBuffer, colorBuffer, p1, p1Color);
+            printPlayer(gl, positionBuffer, colorBuffer, p2, p2Color);
+            printBall(gl, positionBuffer, colorBuffer, ball, ballColor, N_OF_CIRCLE_POINTS);
+            return;
+        }
+
+        updatePlayerDisplacement();
+        updateBallDisplacement();
+
+        newP1 = updatePlayerPosition(p1, dyPlayer1);
+        newP2 = updatePlayerPosition(p2, dyPlayer2);
+        newBall = updateBallPosition(ball, dxBall, dyBall);
+
+        printPlayer(gl, positionBuffer, colorBuffer, newP1, p1Color);
+        printPlayer(gl, positionBuffer, colorBuffer, newP2, p2Color);
+        printBall(gl, positionBuffer, colorBuffer, newBall, ballColor, N_OF_CIRCLE_POINTS);
 
         requestAnimationFrame(render);
     }
 
     render();
-}   
+    
+}
 
 main();
+
+
