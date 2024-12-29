@@ -21,7 +21,7 @@ const cubePosition = setCubeVertices();
 const cubeColor = setCubeFaceColors(colors);
 
 var x0 = 0.0;
-var y0 = 2.0;
+var y0 = 0.0;
 var z0 = 2.0;
 
 var xRef = 0.0;

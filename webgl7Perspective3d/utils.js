@@ -2,9 +2,20 @@ function degToRad(d) {
     return d * Math.PI / 180;
 }
 
+function radToDeg(ang){
+    return ang * 180 / Math.PI;
+}
 function unitVector(v){
     let size = Math.sqrt(Math.pow(v[0],2) +  Math.pow(v[1],2) + Math.pow( v[2], 2));
     return [ v[0]/size, v[1]/size , v[2]/size ];
+}
+
+function perpendicularVectorClockwise(vec2){
+    return [-vec2[1], vec2[0]];
+}
+
+function perpendicularVectorCounterClockwise(vec2){
+    return [-vec2[1], vec2[0]];
 }
 
 function get2DViewingMatrix(point, angle){
