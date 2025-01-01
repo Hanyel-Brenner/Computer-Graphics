@@ -1,15 +1,12 @@
-import {mat4} from './gl-matrix-main.js';
+//import {mat4} from './gl-matrix-main.js';
+import {generateShader, generateProgram} from './shaderProgram.js';
+import { keyboardPressDown, keyboardPressUp, mouseTrack } from './input.js';
 import {setCubeVertices, setCubeFaceColors} from './shapes3d.js';
+import * as camera from './camera.js';
+import {get3DViewingMatrix, getPerspectiveMatrix} from './utils.js';
 
 const N_OF_CIRCLE_POINTS = 100;
 const MAX_POINTS = 3;
-
-var mouseEventCounter = 0;
-var mousePos1 = [];
-var mousePos2 = [];
-var mouseDirection = [0,0];
-
-const keysPressed = {}; 
 
 const colors = [[1.0, 0.0, 0.0],  //front, red
                 [0.0, 1.0, 0.0],  //left, green
@@ -99,6 +96,8 @@ function main() {
     var pRef = [xRef, yRef, zRef];
     var V = [0.0, 1.0, 0.0];
 
+    camera.initialize(p0,pRef);
+
     var xw_min = -1.0;
     var xw_max = 1.0;
     var yw_min = -1.0;
@@ -114,10 +113,9 @@ function main() {
 
     function render(){
 
-        updateCamera();
-
-        p0 = [x0, y0, z0];
-        pRef = [xRef, yRef, zRef];
+        camera.updateCamera();
+        p0 = camera.getCameraPosition();
+        pRef = camera.getReferencePoint();
 
         cameraMatrix = mat4.create();
         persMatrix = mat4.create();

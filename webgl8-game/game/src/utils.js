@@ -1,20 +1,21 @@
-function degToRad(d) {
+export function degToRad(d) {
     return d * Math.PI / 180;
 }
 
-function radToDeg(ang){
+export function radToDeg(ang){
     return ang * 180 / Math.PI;
 }
-function unitVector(v){
+
+export function unitVector(v){
     let size = Math.sqrt(Math.pow(v[0],2) +  Math.pow(v[1],2) + Math.pow( v[2], 2));
     return [ v[0]/size, v[1]/size , v[2]/size ];
 }
 
-function perpendicularVectorClockwise(vec2){
+export function perpendicularVectorClockwise(vec2){
     return [-vec2[1], vec2[0]];
 }
 
-function perpendicularVectorCounterClockwise(vec2){
+export function perpendicularVectorCounterClockwise(vec2){
     return [-vec2[1], vec2[0]];
 }
 
@@ -44,7 +45,7 @@ function get2DWindowToViewportMatrix(xw_min, xw_max, yw_min, yw_max){
 * pRef is commonly pointing to the origin of world coordinate system and V is generally set to (0,1,0), however this is not
 * the y-view value, it will be adjusted based on V.
 */
-function get3DViewingMatrix(p0, pRef, V){
+export function get3DViewingMatrix(p0, pRef, V){
     var matrix = [];
     var N = [p0[0] - pRef[0] , p0[1] - pRef[1] , p0[2] - pRef[2]];
     var n = unitVector(N);
@@ -71,7 +72,7 @@ function get3DViewingMatrix(p0, pRef, V){
     return matrix;
 }
 
-function getOrtographicMatrix(xw_min, xw_max, yw_min, yw_max, z_far, z_near){    
+export function getOrtographicMatrix(xw_min, xw_max, yw_min, yw_max, z_far, z_near){    
     let matrix = [
         2/(xw_max-xw_min), 0, 0, 0,
         0, 2/(yw_max-yw_min), 0, 0,
@@ -81,7 +82,7 @@ function getOrtographicMatrix(xw_min, xw_max, yw_min, yw_max, z_far, z_near){
       return matrix;
 }
 
-function getPerspectiveMatrix(xw_min,xw_max,yw_min,yw_max,z_near,z_far){
+export function getPerspectiveMatrix(xw_min,xw_max,yw_min,yw_max,z_near,z_far){
     let matrix = [
       -(2*z_near)/(xw_max-xw_min), 0, 0, 0,
       0, -(2*z_near)/(yw_max-yw_min), 0, 0,

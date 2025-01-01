@@ -1,4 +1,4 @@
-function generateShader(gl,shaderType,shaderSource){
+export function generateShader(gl,shaderType,shaderSource){
   var shaderTypeStr; 
   if(shaderType == gl.VERTEX_SHADER) shaderTypeStr == 'VERTEX_SHADER';
   if(shaderType == gl.FRAGMENT_SHADER) shaderTypeStr == 'FRAGMENT_SHADER';
@@ -11,7 +11,7 @@ function generateShader(gl,shaderType,shaderSource){
   return shader;
 }
 
-function generateProgram(gl, vertexShader, fragmentShader){
+export function generateProgram(gl, vertexShader, fragmentShader){
   var program = gl.createProgram();
   gl.attachShader(program,vertexShader);
   gl.attachShader(program,fragmentShader);
