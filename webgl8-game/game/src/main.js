@@ -1,9 +1,10 @@
 //import {mat4} from './gl-matrix-main.js';
 import {generateShader, generateProgram} from './shaderProgram.js';
 import { keyboardPressDown, keyboardPressUp, mouseTrack } from './input.js';
-import {setCubeVertices, setCubeFaceColors} from './shapes3d.js';
+import {setCubeVertices, setCubeFaceColors, setCubeNormals} from './shapes3d.js';
 import * as camera from './camera.js';
-import {get3DViewingMatrix, getPerspectiveMatrix} from './utils.js';
+import {degToRad, get3DViewingMatrix, getPerspectiveMatrix} from './utils.js';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
 const N_OF_CIRCLE_POINTS = 100;
 const MAX_POINTS = 3;
@@ -17,6 +18,9 @@ const colors = [[1.0, 0.0, 0.0],  //front, red
 
 const cubePosition = setCubeVertices();
 const cubeColor = setCubeFaceColors(colors);
+const cubeNormal = setCubeNormals();
+
+var light = [0.5, 0.0, 0.5];
 
 var x0 = 0.0;
 var y0 = 0.0;
@@ -27,10 +31,19 @@ var yRef = 0.0;
 var zRef = 0.0;
 
 function main() {
-
+    
     const body = document.querySelector('body');
     const canvas = document.getElementById('canvas');
     const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true } );
+    
+    var loader = new GLTFLoader();
+    loader.load('assets/old_cannon_gltf/scene.gltf', function(gltf){
+        console.log('modelo gltf:');
+        console.log(gltf);
+    }, undefined, function(err){
+       console.log(err);
+    } );
+
 
     if (!gl) {
         throw new Error('WebGL not supported');
@@ -49,7 +62,7 @@ function main() {
     
     const positionBuffer = gl.createBuffer();
     const colorBuffer = gl.createBuffer();
-
+    const normalBuffer = gl.createBuffer();
 /*
 *location refers to the location of the attributes defined in shader or fragment glsl
 */
@@ -63,6 +76,10 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
 
+    const normalLocation = gl.getAttribLocation(program,'normal');
+    gl.enableVertexAttribArray(normalLocation);
+    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+    gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0);
 
 /*
 *Event listeners for keyboard or mouse
@@ -84,6 +101,9 @@ function main() {
 */    
     const transfMatrixLoc = gl.getUniformLocation(program, 'matrix');
     gl.uniformMatrix4fv(transfMatrixLoc, false, mat4.create());
+
+    const lightDirectionLoc = gl.getUniformLocation(program, 'uLightDirection');
+    gl.uniform3fv(lightDirectionLoc, light);
 
 /*
 *clear screen
@@ -110,6 +130,7 @@ function main() {
     var lookAt = mat4.create();
     var model = mat4.create();
     var matrix = mat4.create();
+    var lightMatrix = mat4.create();
 
     function render(){
 
@@ -122,6 +143,7 @@ function main() {
         lookAt = mat4.create();
         model = mat4.create();
         matrix = mat4.create();
+        lightMatrix = mat4.create();
         
         //mat4.rotateY(model,model, degToRad(45));
         //mat4.translate(model, model, [0.0, 0.0, -1.0]);
@@ -132,7 +154,11 @@ function main() {
         mat4.multiply(lookAt, persMatrix, cameraMatrix);
         mat4.multiply(matrix, lookAt, model);
 
+        mat4.rotateY(lightMatrix, lightMatrix, degToRad(0.1));
+        vec3.transformMat4(light, light, lightMatrix);
+
         gl.uniformMatrix4fv(transfMatrixLoc, false, matrix);
+        gl.uniform3fv(lightDirectionLoc, light);
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -142,6 +168,10 @@ function main() {
         
         gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubeColor), gl.STATIC_DRAW);
+
+        /*this is the part where the normals are introduced */
+        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubeNormal), gl.STATIC_DRAW);
         
         gl.drawArrays(gl.TRIANGLES, 0, cubePosition.length/3);
         

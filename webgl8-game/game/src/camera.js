@@ -27,13 +27,9 @@ export function updateCamera(){
   var theta = vec3.angle(direction, [1.0, 0.0, 0.0]);
   var rightDirection = perpendicularVectorClockwise([direction[0], direction[2]]);
   var omega = vec3.angle([rightDirection[0], 0, rightDirection[1]], [1.0, 0.0, 0.0]);
-  //console.log(radToDeg(omega));
-  //console.log(rightDirection);
+  
   var dxFront, dzFront;
   var dxSide, dzSide;
-
-  //console.log("theta : "+radToDeg(theta));
-  //console.log("omega : "+radToDeg(omega));
 
   if( z0 > zRef){
     dxFront = Math.cos(theta);
