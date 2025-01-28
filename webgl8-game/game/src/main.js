@@ -1,12 +1,12 @@
 //import {mat4} from './gl-matrix-main.js';
 import {generateShader, generateProgram} from './shaderProgram.js';
 import { keyboardPressDown, keyboardPressUp, mouseTrack } from './input.js';
-import {setCubeVertices, setCubeFaceColors, setCubeNormals} from './shapes3d.js';
+import {setCubeVertices, setCubeFaceColors, setCubeNormals, setCylinderVertices, setCylinderColor} from './shapes3d.js';
 import * as camera from './camera.js';
 import {degToRad, get3DViewingMatrix, getPerspectiveMatrix} from './utils.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 
-const N_OF_CIRCLE_POINTS = 100;
+const N_OF_CIRCLE_POINTS = 1000;
 const MAX_POINTS = 3;
 
 const colors = [[1.0, 0.0, 0.0],  //front, red
@@ -16,11 +16,14 @@ const colors = [[1.0, 0.0, 0.0],  //front, red
                 [1.0, 0.0, 1.0],    //top , purple
                 [0.0, 1.0, 1.0]];   //bottom, cyan
 
+/* CUBE DATA*/
 const cubePosition = setCubeVertices();
 const cubeColor = setCubeFaceColors(colors);
 const cubeNormal = setCubeNormals();
 
-var light = [0.5, 0.0, 0.5];
+/* CYLINDER DATA*/
+const cylinderPosition = setCylinderVertices([0.9, 0.0, 0.0],[0.9, 0.0,-0.8], 0.2, N_OF_CIRCLE_POINTS);
+const cylinderColor = setCylinderColor([0.0, 1.0, 0.0], N_OF_CIRCLE_POINTS); 
 
 var x0 = 0.0;
 var y0 = 0.0;
@@ -30,19 +33,22 @@ var xRef = 0.0;
 var yRef = 0.0;
 var zRef = 0.0;
 
+var light = [0.5, 0.0, -0.5];
+
 function main() {
     
     const body = document.querySelector('body');
     const canvas = document.getElementById('canvas');
     const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true } );
     
+    /*
     var loader = new GLTFLoader();
     loader.load('assets/old_cannon_gltf/scene.gltf', function(gltf){
         console.log('modelo gltf:');
         console.log(gltf);
     }, undefined, function(err){
        console.log(err);
-    } );
+    } );*/
 
 
     if (!gl) {
@@ -76,11 +82,12 @@ function main() {
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
 
+    /*
     const normalLocation = gl.getAttribLocation(program,'normal');
     gl.enableVertexAttribArray(normalLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
     gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0);
-
+    */
 /*
 *Event listeners for keyboard or mouse
 */    
@@ -174,6 +181,15 @@ function main() {
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubeNormal), gl.STATIC_DRAW);
         
         gl.drawArrays(gl.TRIANGLES, 0, cubePosition.length/3);
+
+        /*DRAWING CYLINDER */
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cylinderPosition), gl.STATIC_DRAW);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cylinderColor), gl.STATIC_DRAW);
+
+        gl.drawArrays(gl.TRIANGLES, 0, cylinderPosition.length*6);
         
         requestAnimationFrame(render);
     }
