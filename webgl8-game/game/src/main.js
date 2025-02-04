@@ -1,37 +1,43 @@
-//import {mat4} from './gl-matrix-main.js';
 import {generateShader, generateProgram} from './shaderProgram.js';
 import { keyboardPressDown, keyboardPressUp, mouseTrack } from './input.js';
-import {setCubeVertices, setCubeFaceColors, setCubeNormals, setCylinderVertices, setCylinderColor} from './shapes3d.js';
+import {setCubeVertices, setCubeColors, setCubeNormals, setCylinderVertices, setCylinderColor, createMatrix, applyTransformation, setLandscapeVertices} from './shapes3d.js';
 import * as camera from './camera.js';
 import {degToRad, get3DViewingMatrix, getPerspectiveMatrix} from './utils.js';
-import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import { renderCylinder, renderCube } from './renderFunctions.js';
 
 const N_OF_CIRCLE_POINTS = 1000;
 const MAX_POINTS = 3;
 
-const colors = [[1.0, 0.0, 0.0],  //front, red
+const color = [[1.0, 0.0, 0.0],  //front, red
                 [0.0, 1.0, 0.0],  //left, green
-                [0.0 , 0.0, 1.0], //back, blue
+                [0.0 ,0.0, 1.0], //back, blue
                 [1.0, 1.0, 0.0],    //right, yellow
-                [1.0, 0.0, 1.0],    //top , purple
-                [0.0, 1.0, 1.0]];   //bottom, cyan
+                [0.0, 1.0, 1.0],    //top , purple
+                [1.0, 0.0, 1.0]];   //bottom, cyan
+
+const color2 = [[0.87, 0.87, 0.87],
+                [0.87, 0.87, 0.87],
+                [0.87, 0.87, 0.87],
+                [0.87, 0.87, 0.87],
+                [0.87, 0.87, 0.87],
+                [0.87, 0.87, 0.87]];
 
 /* CUBE DATA*/
-const cubePosition = setCubeVertices();
-const cubeColor = setCubeFaceColors(colors);
-const cubeNormal = setCubeNormals();
-
+var cubePosition = setCubeVertices(0.5);
+var cubeColor = setCubeColors(color);
+var cubeNormal = setCubeNormals();
+/* LANDSCAPE DATA*/
+var landscapePosition = setLandscapeVertices(200, 0.5);
+var landscapeColor = setCubeColors(color2);
+var landscapeMat = createMatrix( [0.0, -0.5, 0.0] ,{ type: 'y', angle: degToRad(0)}, [0.0, 0.0, 0.0]);
+landscapePosition = applyTransformation(landscapePosition, landscapeMat);
 /* CYLINDER DATA*/
-const cylinderPosition = setCylinderVertices([0.9, 0.0, 0.0],[0.9, 0.0,-0.8], 0.2, N_OF_CIRCLE_POINTS);
-const cylinderColor = setCylinderColor([0.0, 1.0, 0.0], N_OF_CIRCLE_POINTS); 
-
-var x0 = 0.0;
-var y0 = 0.0;
-var z0 = 2.0;
-
-var xRef = 0.0;
-var yRef = 0.0;
-var zRef = 0.0;
+var rodPosition = setCylinderVertices([0.9, 0.9, 0.0],[0.9, 0.0,-0.8], 0.05, N_OF_CIRCLE_POINTS);
+var rodColor = setCylinderColor([0.0, 1.0, 0.0], N_OF_CIRCLE_POINTS); 
+var rodReelPosition = setCylinderVertices( [ 0.95, 0.1,-0.6], [ 0.99, 0.1 ,-0.7], 0.07, N_OF_CIRCLE_POINTS);
+var rodReelColor = setCylinderColor([0.57, 1.0, 0.33], N_OF_CIRCLE_POINTS);
+var rodReelMat = createMatrix([-0.95, -0.1, 0.6], {type : 'y', angle : degToRad(90)}, [0.99, 0.1, -0.6 ]);
+rodReelPosition = applyTransformation(rodReelPosition, rodReelMat);
 
 var light = [0.5, 0.0, -0.5];
 
@@ -41,16 +47,6 @@ function main() {
     const canvas = document.getElementById('canvas');
     const gl = canvas.getContext('webgl', { preserveDrawingBuffer: true } );
     
-    /*
-    var loader = new GLTFLoader();
-    loader.load('assets/old_cannon_gltf/scene.gltf', function(gltf){
-        console.log('modelo gltf:');
-        console.log(gltf);
-    }, undefined, function(err){
-       console.log(err);
-    } );*/
-
-
     if (!gl) {
         throw new Error('WebGL not supported');
     }
@@ -81,16 +77,7 @@ function main() {
     gl.enableVertexAttribArray(colorLocation);
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(colorLocation, 3, gl.FLOAT, false, 0, 0);
-
-    /*
-    const normalLocation = gl.getAttribLocation(program,'normal');
-    gl.enableVertexAttribArray(normalLocation);
-    gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0);
-    */
-/*
-*Event listeners for keyboard or mouse
-*/    
+  
     body.addEventListener("keydown", function(event){
         keyboardPressDown(event);
     },false);
@@ -119,10 +106,9 @@ function main() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
 
-    var p0 = [x0, y0, z0];
-    var pRef = [xRef, yRef, zRef];
+    var p0 = [0.0, 0.0, 2.0];
+    var pRef = [0.0, 0.0, 0.0];
     var V = [0.0, 1.0, 0.0];
-
     camera.initialize(p0,pRef);
 
     var xw_min = -1.0;
@@ -130,7 +116,7 @@ function main() {
     var yw_min = -1.0;
     var yw_max = 1.0;
     var z_near = -1.0;
-    var z_far = -20.0
+    var z_far = -200.0
 
     var cameraMatrix = mat4.create();
     var persMatrix = mat4.create();
@@ -138,6 +124,9 @@ function main() {
     var model = mat4.create();
     var matrix = mat4.create();
     var lightMatrix = mat4.create();
+
+    console.log("sum of vertices :"+(landscapePosition.length+cubePosition.length+rodPosition.length+rodReelPosition.length));
+    console.log("sum of color: "+(landscapeColor.length+cubeColor.length+rodColor.length+rodReelColor.length));
 
     function render(){
 
@@ -152,10 +141,6 @@ function main() {
         matrix = mat4.create();
         lightMatrix = mat4.create();
         
-        //mat4.rotateY(model,model, degToRad(45));
-        //mat4.translate(model, model, [0.0, 0.0, -1.0]);
-        //mat4.scale(model, model, [0.5, 0.5, 0.5])
-
         cameraMatrix = get3DViewingMatrix(p0, pRef, V);
         persMatrix = getPerspectiveMatrix(xw_min, xw_max, yw_min, yw_max, z_near, z_far);
         mat4.multiply(lookAt, persMatrix, cameraMatrix);
@@ -170,26 +155,10 @@ function main() {
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubePosition), gl.STATIC_DRAW);
-        
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubeColor), gl.STATIC_DRAW);
-
-        /*this is the part where the normals are introduced */
-        gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cubeNormal), gl.STATIC_DRAW);
-        
-        gl.drawArrays(gl.TRIANGLES, 0, cubePosition.length/3);
-
-        /*DRAWING CYLINDER */
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cylinderPosition), gl.STATIC_DRAW);
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(cylinderColor), gl.STATIC_DRAW);
-
-        gl.drawArrays(gl.TRIANGLES, 0, cylinderPosition.length*6);
+        renderCube(gl, positionBuffer, colorBuffer, landscapePosition, landscapeColor);
+        renderCube(gl, positionBuffer, colorBuffer, cubePosition, cubeColor);
+        renderCylinder(gl, positionBuffer, colorBuffer, rodPosition, rodColor);
+        renderCylinder(gl, positionBuffer, colorBuffer, rodReelPosition, rodReelColor);
         
         requestAnimationFrame(render);
     }

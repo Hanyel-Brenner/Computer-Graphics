@@ -1,35 +1,40 @@
-
-/* 
-*generates the vertex array for a circle constructed using the number of points (or triangles generated) as specified in the numberOfPoints
-*not optimized, since it has many duplicated vertex;
-*data is put in dynamic array so must be converted to a typed float array outside of function
-*/
-function setCircleVertices(gl,c_x, c_y, radius, numberOfPoints){
-  var angle = (2 * Math.PI)/numberOfPoints; 
+export function setCircleVertices(center, radius, numberOfPoints){
+  var angle = (2 * Math.PI)/numberOfPoints;
+  var xc = center[0], yc = center[1], zc = center[2];
   var vertices = [];
   
   for(let i=0; i<numberOfPoints; i++){
-    var x = radius * Math.cos(angle*i) + c_x;
-    var y = radius * Math.sin(angle*i) + c_y;
-    var x2 = radius * Math.cos(angle*(i+1)) + c_x;
-    var y2 = radius * Math.sin(angle*(i+1)) + c_y;
+    var x = radius * Math.cos(angle*i) + xc;
+    var y = radius * Math.sin(angle*i) + yc;
+    var z = zc;
+    var x2 = radius * Math.cos(angle*(i+1)) + xc;
+    var y2 = radius * Math.sin(angle*(i+1)) + yc;
+    var z2 = zc;
     
     vertices.push(x);
     vertices.push(y);
+    vertices.push(z);
     vertices.push(x2);
     vertices.push(y2);
-    vertices.push(0.0 + c_x);
-    vertices.push(0.0 + c_y); 
+    vertices.push(z2);
+    vertices.push(0.0 + xc);
+    vertices.push(0.0 + yc);
+    vertices.push(0.0 + zc); 
   }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+  return vertices;
 }
 
-/*
-*generates vertex array for rectangle and binds the data to the array buffer
-*not optmized, since it has duplicated vertex data
-*data is put in dynamic array so must be converted to a typed float array outside of function
-*/
-function setRectangleVertices(gl,x,y,width, height){
+export function setCircleColor(color , numberOfPoints){
+  var colorArray = [];  
+  for(let i=0; i<numberOfPoints*3; i++){
+    colorArray.push(color[0]);
+    colorArray.push(color[1]);
+    colorArray.push(color[2]); 
+  }
+  return colorArray;
+}
+
+export function setRectangleVertices(x,y,width, height){
   let x1 = x;
   let y1 = y;
   let x2 = x1 + width;
@@ -44,32 +49,16 @@ function setRectangleVertices(gl,x,y,width, height){
       x2, y2, 0.0,
   ]
 
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexData), gl.STATIC_DRAW);
+  return vertexData;
 }
 
-/* 
-*generates the color array for a circle with given number of points
-*/
-function setCircleColor(gl, c1,c2,c3 , numberOfPoints){
-  var colorArray = [];  
-  for(let i=0; i<numberOfPoints*6; i++){
-    colorArray.push(c1);
-    colorArray.push(c2);
-    colorArray.push(c3); 
-  }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorArray), gl.STATIC_DRAW);
-}
-
-/* 
-*generates the color array for a single rectangle (composed of two triangles)
-*/
-function setRectangleColor(gl, c1,c2,c3){
+export function setRectangleColor(color){
   colorArray = [];
 
   for(let i=0; i<6; i++){
-    colorArray.push(c1);
-    colorArray.push(c2);
-    colorArray.push(c3);  
+    colorArray.push(color[0]);
+    colorArray.push(color[1]);
+    colorArray.push(color[2]);  
   }
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorArray), gl.STATIC_DRAW);
+  return colorArray;
 }

@@ -90,4 +90,4 @@ export function getPerspectiveMatrix(xw_min,xw_max,yw_min,yw_max,z_near,z_far){
       0, 0, -1, 0,
     ];
     return matrix;
-  }
+}

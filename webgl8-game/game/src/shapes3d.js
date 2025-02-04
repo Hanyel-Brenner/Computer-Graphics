@@ -1,52 +1,141 @@
-export function setCubeVertices(){
+import {setCircleVertices, setCircleColor} from './shapes2d.js';
+
+export function createMatrix(translation, rotation, translation2){
+    var matrix = mat4.create();
+    mat4.translate(matrix, matrix,translation2);
+    switch(rotation.type){
+        case 'x':
+            mat4.rotateX(matrix, matrix,rotation.angle);
+            break;
+        case 'y':
+            mat4.rotateY(matrix, matrix,rotation.angle);
+            break;
+        case 'z':
+            mat4.rotateZ(matrix, matrix,rotation.angle);
+            break;
+    }
+    mat4.translate(matrix, matrix,translation);
+    return matrix;
+}
+
+export function applyTransformation(object, transfMatrix){
+    var len = object.length;
+    var newObject = [];
+    var oldVertex = [];
+    var newVertex = [];
+    for(let i=0; i < len; i += 3){
+        oldVertex[0] = object[i];
+        oldVertex[1] = object[i+1];
+        oldVertex[2] = object[i+2];
+        vec3.transformMat4(newVertex, oldVertex ,transfMatrix);
+        newObject.push(newVertex[0], newVertex[1], newVertex[2]);
+    }
+    return newObject;
+}
+
+export function setLandscapeVertices( len, h){
     const vertexData = [
         // Front
-        0.5, 0.5, 0.5,
-        0.5, -.5, 0.5,
-        -.5, 0.5, 0.5,
-        -.5, 0.5, 0.5,
-        0.5, -.5, 0.5,
-        -.5, -.5, 0.5,
+        len, h, len,
+        len, -h, len,
+        -len, h, len,
+        -len, h, len,
+        len, -h, len,
+        -len, -h, len,
     
         // Left
-        -.5, 0.5, 0.5,
-        -.5, -.5, 0.5,
-        -.5, 0.5, -.5,
-        -.5, 0.5, -.5,
-        -.5, -.5, 0.5,
-        -.5, -.5, -.5,
+        -len, h, len,
+        -len, -h, len,
+        -len, h, -len,
+        -len, h, -len,
+        -len, -h,len,
+        -len, -h, -len,
     
         // Back
-        -.5, 0.5, -.5,
-        -.5, -.5, -.5,
-        0.5, 0.5, -.5,
-        0.5, 0.5, -.5,
-        -.5, -.5, -.5,
-        0.5, -.5, -.5,
+        -len, h, -len,
+        -len, -h, -len,
+        len, h, -len,
+        len, h, -len,
+        -len, -h, -len,
+        len, -h, -len,
     
         // Right
-        0.5, 0.5, -.5,
-        0.5, -.5, -.5,
-        0.5, 0.5, 0.5,
-        0.5, 0.5, 0.5,
-        0.5, -.5, 0.5,
-        0.5, -.5, -.5,
+        len, h, -len,
+        len, -h, -len,
+        len, h, len,
+        len, h, len,
+        len, -h, len,
+        len, -h, -len,
     
         // Top
-        0.5, 0.5, 0.5,
-        0.5, 0.5, -.5,
-        -.5, 0.5, 0.5,
-        -.5, 0.5, 0.5,
-        0.5, 0.5, -.5,
-        -.5, 0.5, -.5,
+        len, h, len,
+        len, h, -len,
+        -len, h, len,
+        -len, h, len,
+        len, h, -len,
+        -len, h, -len,
     
         // Bottom
-        0.5, -.5, 0.5,
-        0.5, -.5, -.5,
-        -.5, -.5, 0.5,
-        -.5, -.5, 0.5,
-        0.5, -.5, -.5,
-        -.5, -.5, -.5,
+        len, -h, len,
+        len, -h, -len,
+        -len, -h, len,
+        -len, -h, len,
+        len, -h, -len,
+        -len, -h, -len,
+      ];
+      return vertexData;
+}
+
+
+export function setCubeVertices(n){
+    const vertexData = [
+        // Front
+        n, n, n,
+        n, -n, n,
+        -n, n, n,
+        -n, n, n,
+        n, -n, n,
+        -n, -n, n,
+    
+        // Left
+        -n, n, n,
+        -n, -n, n,
+        -n, n, -n,
+        -n, n, -n,
+        -n, -n, n,
+        -n, -n, -n,
+    
+        // Back
+        -n, n, -n,
+        -n, -n, -n,
+        n, n, -n,
+        n, n, -n,
+        -n, -n, -n,
+        n, -n, -n,
+    
+        // Right
+        n, n, -n,
+        n, -n, -n,
+        n, n, n,
+        n, n, n,
+        n, -n, n,
+        n, -n, -n,
+    
+        // Top
+        n, n, n,
+        n, n, -n,
+        -n, n, n,
+        -n, n, n,
+        n, n, -n,
+        -n, n, -n,
+    
+        // Bottom
+        n, -n, n,
+        n, -n, -n,
+        -n, -n, n,
+        -n, -n, n,
+        n, -n, -n,
+        -n, -n, -n,
       ];
       return vertexData;
 }
@@ -56,7 +145,7 @@ export function setCubeVertices(){
 * The colors should be inputed in the order of the face that is closest to the z = 0 plane,
 * then you specify in counter-clock wise the other faces, finishing with top and bottom
 */
-export function setCubeFaceColors(colors){
+export function setCubeColors(colors){
     var colorData = [];
     for(let i=0; i < 6; i++){
         for(let j=0; j < 6; j++){
@@ -156,7 +245,7 @@ export function setCylinderVertices(circle1, circle2, radius, nOfCirclePoints){
         vertexArray.push(circle2Points[0]);
         vertexArray.push(circle1Points[0]);
         vertexArray.push(circle1Points[circle1Points.length - 1]);
-        vertexArray.push(circle2Points[circle2Points.length - 1]);
+        vertexArray.push(circle2Points[0]);
         
     var formatedVertexArray = [];
 
@@ -164,6 +253,16 @@ export function setCylinderVertices(circle1, circle2, radius, nOfCirclePoints){
         formatedVertexArray.push(vertexArray[i][0]);
         formatedVertexArray.push(vertexArray[i][1]);
         formatedVertexArray.push(vertexArray[i][2]);
+    }
+    
+    var circleCap1 = setCircleVertices(circle1, radius, nOfCirclePoints);
+    var circleCap2 = setCircleVertices(circle2, radius, nOfCirclePoints);
+
+    for(let i =0 ; i<circleCap1.length; i++){
+        formatedVertexArray.push(circleCap1[i]);
+    }
+    for(let i=0; i<circleCap2.length; i++){
+        formatedVertexArray.push(circleCap2[i]);
     }
     return formatedVertexArray;
 }
@@ -175,5 +274,11 @@ export function setCylinderColor(color, nOfCirclePoints){
         colorArray.push(color[1]);
         colorArray.push(color[2]);
     }
+    var circleCapColor = setCircleColor(color, nOfCirclePoints);
+    for(let j=0; j<circleCapColor.length; j++){
+        colorArray.push(circleCapColor[i]);
+        colorArray.push(circleCapColor[i]);
+    }
+    
     return colorArray;
 }
